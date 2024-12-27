@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton,
-    QLabel, QLineEdit, QMessageBox, QTableWidget, QTableWidgetItem
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QGridLayout, QLineEdit, 
+    QPushButton, QLabel, QTableWidget, QTableWidgetItem, QMessageBox
 )
 from PyQt6.QtCore import Qt
 import yfinance as yf
@@ -12,46 +12,54 @@ class StockApp(QMainWindow):
         super().__init__()
         self.setWindowTitle("Stock Tracker")
         self.setGeometry(100, 100, 800, 600)
-
-        # Main layout
+        self.DB = DB
+                # Main layout
         self.central_widget = QWidget()
-        self.layout = QVBoxLayout(self.central_widget)
+        self.main_layout = QVBoxLayout(self.central_widget)
+
+        # Input layout (use QGridLayout for grid-style alignment)
+        self.input_layout = QGridLayout()
 
         # Stock input
         self.stock_input = QLineEdit()
         self.stock_input.setPlaceholderText("Enter Stock Ticker Symbol")
-        self.layout.addWidget(self.stock_input)
+        self.input_layout.addWidget(self.stock_input, 0, 0)  # Row 0, Column 0
 
         # Amount input
         self.amount_input = QLineEdit()
         self.amount_input.setPlaceholderText("Enter Amount (Number of Shares)")
-        self.layout.addWidget(self.amount_input)
+        self.input_layout.addWidget(self.amount_input, 1, 0)  # Row 0, Column 1
 
         # Add to Favorites Button
         self.add_button = QPushButton("Add to Favorites")
         self.add_button.clicked.connect(self.add_to_favorites)
-        self.layout.addWidget(self.add_button)
+        self.input_layout.addWidget(self.add_button, 0, 1)  # Row 1, Column 0
 
-        # Add to Favorites Button
+        # Remove from Favorites Button
         self.remove_button = QPushButton("Remove from Favorites")
         self.remove_button.clicked.connect(self.remove)
-        self.layout.addWidget(self.remove_button)
+        self.input_layout.addWidget(self.remove_button, 1, 1)  # Row 1, Column 1
+
+        # Add the input layout to the main layout
+        self.main_layout.addLayout(self.input_layout)
 
         # Stock Info Label
         self.stock_info_label = QLabel("Stock Information will appear here.")
         self.stock_info_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.layout.addWidget(self.stock_info_label)
+        self.main_layout.addWidget(self.stock_info_label)
 
         # Show Favorites Button
         self.show_favorites_button = QPushButton("Show Favorite Stocks")
         self.show_favorites_button.clicked.connect(self.show_favorites)
-        self.layout.addWidget(self.show_favorites_button)
+        self.main_layout.addWidget(self.show_favorites_button)
 
         # Favorites Table
         self.favorites_table = QTableWidget()
-        self.layout.addWidget(self.favorites_table)
+        self.main_layout.addWidget(self.favorites_table)
 
         self.setCentralWidget(self.central_widget)
+        self.show_favorites()
+
         
 
     def show_favorites(self):
@@ -69,9 +77,9 @@ class StockApp(QMainWindow):
 
                 self.favorites_table.setItem(row, 0, QTableWidgetItem(long_name))
                 self.favorites_table.setItem(row, 1, QTableWidgetItem(ticker))
-                self.favorites_table.setItem(row, 2, QTableWidgetItem(str(current_price)))
+                self.favorites_table.setItem(row, 2, QTableWidgetItem(str(current_price) + " $"))
                 self.favorites_table.setItem(row, 3, QTableWidgetItem(str(amount)))
-                self.favorites_table.setItem(row, 4, QTableWidgetItem(str(float(current_price) * amount) if current_price != 'N/A' else 'N/A'))
+                self.favorites_table.setItem(row, 4, QTableWidgetItem(str(float(current_price) * amount) + " $" if current_price != 'N/A' else 'N/A') )
 
             except Exception as e:
                 QMessageBox.warning(self, "Data Error", f"Error fetching data for {ticker}.\n{e}")
