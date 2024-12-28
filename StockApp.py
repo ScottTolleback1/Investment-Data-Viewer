@@ -100,7 +100,7 @@ class StockApp(QMainWindow):
                 self.favorites_table.setItem(row, 1, QTableWidgetItem(ticker))
                 self.favorites_table.setItem(row, 2, QTableWidgetItem(f"{current_price} $"))
                 self.favorites_table.setItem(row, 3, QTableWidgetItem(str(amount)))
-                self.favorites_table.setItem(row, 4, QTableWidgetItem(f"{float(current_price) * amount} $" if current_price != 'N/A' else 'N/A'))
+                self.favorites_table.setItem(row, 4, QTableWidgetItem(f"{round(float(current_price) * amount, 2)} $" if current_price != 'N/A' else 'N/A'))
                 self.favorites_table.setItem(row, 5, QTableWidgetItem(str(diff) + "%"))
 
             except Exception as e:

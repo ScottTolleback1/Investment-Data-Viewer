@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QComboBox, QLabel, QSizePolicy
+from PyQt6.QtWidgets import QApplication, QPushButton, QHBoxLayout, QMainWindow, QVBoxLayout, QWidget, QComboBox, QLabel, QSizePolicy
 from PyQt6.QtGui import QGuiApplication
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -21,10 +21,16 @@ class StockGraph(QMainWindow):
         self.label = QLabel(f"Stock: {self.ticker}")
         self.main_layout.addWidget(self.label)
         
-        self.combo_box = QComboBox()
-        self.combo_box.addItems(["1d", "1mo", "1y"])
-        self.combo_box.currentTextChanged.connect(self.plot_stock_graph)
-        self.main_layout.addWidget(self.combo_box)
+        self.button_layout = QHBoxLayout()
+        periods = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
+        # Create buttons
+        for period in periods:
+            button = QPushButton(period)  # Button text as the period
+            button.clicked.connect(lambda _, p=period: self.plot_stock_graph(p))
+            self.button_layout.addWidget(button)
+                # Add the button layout to the main layout
+        self.main_layout.addLayout(self.button_layout)
+
 
         # Matplotlib figure and canvas
         self.figure = Figure()
@@ -40,6 +46,9 @@ class StockGraph(QMainWindow):
         try:
             stock_data = yf.Ticker(self.ticker)
             historical_data = stock_data.history(period=period)
+            if period is "1d":
+                historical_data = stock_data.history(period=period, interval="1m")
+            
 
             self.figure.clear()
             ax = self.figure.add_subplot(111)
