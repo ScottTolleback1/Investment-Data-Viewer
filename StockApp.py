@@ -83,8 +83,8 @@ class StockApp(QMainWindow):
         self.favorites_table.clear()
         favorites = self.DB.get_favorite_stocks()
         self.favorites_table.setRowCount(len(favorites))
-        self.favorites_table.setColumnCount(5)
-        self.favorites_table.setHorizontalHeaderLabels(["Name", "Ticker", "Current Price", "Amount", "Amount Value"])
+        self.favorites_table.setColumnCount(6)
+        self.favorites_table.setHorizontalHeaderLabels(["Name", "Ticker", "Current Price", "Amount", "Amount Value", "Change Today"])
 
         sorted_favorites = sorted(favorites, key=lambda x: x[0])
         for row, (ticker, amount) in enumerate(sorted_favorites):
@@ -92,12 +92,16 @@ class StockApp(QMainWindow):
                 stock_data = self.DB.find_stock(ticker)
                 long_name = stock_data['long_name']
                 current_price = stock_data['current_price']
-
+                first_price = stock_data['change']
+                diff = round(((current_price - first_price) / first_price) * 100, 2)
+                for i in range(len(favorites)):
+                    self.favorites_table.setColumnWidth(i, 125)
                 self.favorites_table.setItem(row, 0, QTableWidgetItem(long_name))
                 self.favorites_table.setItem(row, 1, QTableWidgetItem(ticker))
                 self.favorites_table.setItem(row, 2, QTableWidgetItem(f"{current_price} $"))
                 self.favorites_table.setItem(row, 3, QTableWidgetItem(str(amount)))
                 self.favorites_table.setItem(row, 4, QTableWidgetItem(f"{float(current_price) * amount} $" if current_price != 'N/A' else 'N/A'))
+                self.favorites_table.setItem(row, 5, QTableWidgetItem(str(diff) + "%"))
 
             except Exception as e:
                 QMessageBox.warning(self, "Data Error", f"Error fetching data for {ticker}.\n{e}")

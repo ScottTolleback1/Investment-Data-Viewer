@@ -116,12 +116,13 @@ class DB():
 
             # Extract long name and current price
             long_name = info.get('longName', stock)    # Use ticker as fallback if longName is unavailable
-            current_price = info.get('regularMarketPrice') or info.get('currentPrice') or info.get('previousClose') or 'N/A'
-
+            current_price = round(info.get('regularMarketPrice') or info.get('currentPrice') or info.get('previousClose') or 'N/A', 2)
+            change = info.get('regularMarketOpen') or info.get('regularMarketPrice') or info.get('previousClose') or 'N/A'
             # Return only long name and current price
             return {
                 'long_name': long_name,
-                'current_price': current_price
+                'current_price': current_price,
+                'change' : change
             }
 
         except Exception as e:
