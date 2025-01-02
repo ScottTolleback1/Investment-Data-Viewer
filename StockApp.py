@@ -7,6 +7,7 @@ from PyQt6.QtCore import Qt
 import yfinance as yf
 from DB import DB  # Make sure this imports your DB class
 from StockGraph import StockGraph  # Import the StockGraph class
+from Generate_Company_names import Generate_Company_names
 
 
 
@@ -16,7 +17,7 @@ class StockApp(QMainWindow):
         self.setWindowTitle("Stock Tracker")
         self.setGeometry(100, 100, 800, 600)
         self.DB = DB
-        
+        self.gcn = Generate_Company_names()
 
         # Main layout
         self.central_widget = QWidget()
@@ -74,9 +75,13 @@ class StockApp(QMainWindow):
         ticker = self.search_input.text().strip().upper()
         if ticker:
             # Open a new StockGraph window to display the stock chart
+            
             self.hide()
-
+            if not self.gcn.ticker_exist(ticker):
+                ticker = self.gcn.match(ticker)
+            
             sg = StockGraph(ticker, self)
+            
             sg.show()
             
         self.search_input.clear()

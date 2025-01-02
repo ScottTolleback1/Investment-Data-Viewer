@@ -3,7 +3,6 @@ from PyQt6.QtGui import QGuiApplication
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import yfinance as yf
-import sys
 
 
 class StockGraph(QMainWindow):
@@ -38,7 +37,7 @@ class StockGraph(QMainWindow):
         self.main_layout.addWidget(self.canvas)
 
         self.setCentralWidget(self.central_widget)
-
+        
         # Plot the stock graph for the initial period
         self.plot_stock_graph("1y")
 
@@ -56,7 +55,11 @@ class StockGraph(QMainWindow):
             ax.set_facecolor("black")  # Black background
             self.figure.patch.set_facecolor("black")  # Background for the figure
 
-            ax.plot(historical_data.index, historical_data['Close'], color="lime", label="Closing Price")  # Green plot
+            ax.plot(historical_data.index, historical_data['Close'], color="lime", label="Closing Price", linestyle='-', linewidth=2)
+
+            # Set the legend's label color to white
+            ax.legend(facecolor='black', edgecolor='white', labelcolor='white')
+
 
             # Customize titles and labels
             ax.set_title(f"{self.ticker} - Last {period}", color="white")
@@ -66,10 +69,7 @@ class StockGraph(QMainWindow):
             # Customize ticks
             ax.tick_params(axis='x', colors="white")
             ax.tick_params(axis='y', colors="white")
-
-            # Add legend
-            ax.legend(facecolor="black", edgecolor="white", loc="best")
-
+            
             # Add grid
             ax.grid(color="gray", linestyle="--", linewidth=0.5)
 
