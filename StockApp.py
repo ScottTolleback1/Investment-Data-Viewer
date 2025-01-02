@@ -74,16 +74,21 @@ class StockApp(QMainWindow):
     def search_stock(self):
         ticker = self.search_input.text().strip().upper()
         if ticker:
-            # Open a new StockGraph window to display the stock chart
-            
-            self.hide()
             if not self.gcn.ticker_exist(ticker):
                 ticker = self.gcn.match(ticker)
+                if ticker != "No match found":
+                    self.hide()
+                    sg = StockGraph(ticker, self)
+                    sg.show()
+                else: 
+                    QMessageBox.warning(self, "Input Error", "No matches was found.")
+            else:
+                self.hide()
+                sg = StockGraph(ticker, self)
+                sg.show()
             
-            sg = StockGraph(ticker, self)
             
-            sg.show()
-            
+        
         self.search_input.clear()
         self.search_input.setPlaceholderText("Enter ticker to search stock")
 

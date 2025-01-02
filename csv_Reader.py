@@ -10,7 +10,9 @@ with open('nasdaq', 'w') as file:
         # Check if 'Common Stock' is in the Name column
         if 'Common Stock' in row['Name']:
             # Remove 'Common Stock' from the Name
-            company_name = row['Name'].replace(' Common Stock', '')
+            company_name = row['Name'].replace('Common Stock', '')
+            company_name = row['Name'].replace('Inc', '')
+            company_name = row['Name'].replace('Corporation', '')
             # Write the cleaned 'Name' and 'Symbol' columns to the file
             file.write(f"{company_name} ({row['Symbol']})\n")
 

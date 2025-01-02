@@ -6,11 +6,8 @@ class Generate_Company_names:
         self.names = []
         self.tickers = []
         
-        # Open the file that contains the company names and tickers
         with open('nasdaq', 'r') as file:
-            # Read each line in the file
             for line in file:
-                # Remove any leading/trailing whitespaces
                 line = line.strip()
 
                 if line:
@@ -20,24 +17,28 @@ class Generate_Company_names:
                         
                         self.names.append(name)
                         self.tickers.append(ticker)
-        self.vectorizer = CountVectorizer().fit(self.names)
+        
+        self.vectorizer = CountVectorizer(analyzer='char', ngram_range=(3, 5)).fit(self.names)
         self.names_vectorized = self.vectorizer.transform(self.names)
-
 
     def get_names(self):
         return self.names
 
     def ticker_exist(self, input):
-        if input in self.tickers: return True
-        else: return False
-    
-    def match(self, input):
-        # Vectorize the input string and compare with pre-calculated vectors of company names
+        return input in self.tickers
+
+    def match(self, input, threshold=0.5):
         input_vectorized = self.vectorizer.transform([input])
+        
         cosine_similarities = cosine_similarity(input_vectorized, self.names_vectorized)
         
-        # Find the index of the best match
         best_match_index = cosine_similarities.argmax()
-        best_match = self.tickers[best_match_index]
-        return best_match
+        max_score = cosine_similarities.max()
+
+        best_match_score = cosine_similarities[0, best_match_index]
+        
+        if best_match_score >= threshold:
+            return self.tickers[best_match_index]
+        else:
+            return "No match found"
 
