@@ -46,23 +46,38 @@ class StockGraph(QMainWindow):
         try:
             stock_data = yf.Ticker(self.ticker)
             historical_data = stock_data.history(period=period)
-            if period is "1d":
+            if period == "1d":
                 historical_data = stock_data.history(period=period, interval="1m")
             
-
             self.figure.clear()
             ax = self.figure.add_subplot(111)
-            ax.plot(historical_data.index, historical_data['Close'], label="Closing Price")
-            ax.set_title(f"{self.ticker} - Last {period}")
-            ax.set_xlabel("Date")
-            ax.set_ylabel("Price (USD)")
-            ax.legend()
-            ax.grid()
+
+            # Set background and plot style
+            ax.set_facecolor("black")  # Black background
+            self.figure.patch.set_facecolor("black")  # Background for the figure
+
+            ax.plot(historical_data.index, historical_data['Close'], color="lime", label="Closing Price")  # Green plot
+
+            # Customize titles and labels
+            ax.set_title(f"{self.ticker} - Last {period}", color="white")
+            ax.set_xlabel("Date", color="white")
+            ax.set_ylabel("Price (USD)", color="white")
+
+            # Customize ticks
+            ax.tick_params(axis='x', colors="white")
+            ax.tick_params(axis='y', colors="white")
+
+            # Add legend
+            ax.legend(facecolor="black", edgecolor="white", loc="best")
+
+            # Add grid
+            ax.grid(color="gray", linestyle="--", linewidth=0.5)
 
             self.canvas.draw()
 
         except Exception as e:
             print(f"Error: {e}")
+
 
     def closeEvent(self, event):
         # Show the parent window again after closing the StockGraph window

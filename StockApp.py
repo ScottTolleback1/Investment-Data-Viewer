@@ -2,10 +2,12 @@ from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QGridLayout, QLineEdit, 
     QPushButton, QLabel, QTableWidget, QTableWidgetItem, QMessageBox
 )
+from PyQt6.QtGui import QColor
 from PyQt6.QtCore import Qt
 import yfinance as yf
 from DB import DB  # Make sure this imports your DB class
 from StockGraph import StockGraph  # Import the StockGraph class
+
 
 
 class StockApp(QMainWindow):
@@ -14,6 +16,7 @@ class StockApp(QMainWindow):
         self.setWindowTitle("Stock Tracker")
         self.setGeometry(100, 100, 800, 600)
         self.DB = DB
+        
 
         # Main layout
         self.central_widget = QWidget()
@@ -94,14 +97,29 @@ class StockApp(QMainWindow):
                 current_price = stock_data['current_price']
                 first_price = stock_data['change']
                 diff = round(((current_price - first_price) / first_price) * 100, 2)
+
+                # Set column widths
                 for i in range(len(favorites)):
                     self.favorites_table.setColumnWidth(i, 125)
+
+                # Set items in table
                 self.favorites_table.setItem(row, 0, QTableWidgetItem(long_name))
                 self.favorites_table.setItem(row, 1, QTableWidgetItem(ticker))
                 self.favorites_table.setItem(row, 2, QTableWidgetItem(f"{current_price} $"))
                 self.favorites_table.setItem(row, 3, QTableWidgetItem(str(amount)))
                 self.favorites_table.setItem(row, 4, QTableWidgetItem(f"{round(float(current_price) * amount, 2)} $" if current_price != 'N/A' else 'N/A'))
-                self.favorites_table.setItem(row, 5, QTableWidgetItem(str(diff) + "%"))
+
+                # Create the Change Today item
+                change_item = QTableWidgetItem(f"{str(diff)}%")
+                self.favorites_table.setItem(row, 5, change_item)
+
+                # Apply color formatting based on diff value
+                if diff > 0:
+                    change_item.setForeground(QColor("green"))
+                elif diff == 0:
+                    change_item.setForeground(QColor("white"))
+                else:
+                    change_item.setForeground(QColor("red"))
 
             except Exception as e:
                 QMessageBox.warning(self, "Data Error", f"Error fetching data for {ticker}.\n{e}")
