@@ -67,13 +67,13 @@ class StockApp(QMainWindow):
                 ticker = self.gcn.match(ticker)
                 if ticker != "No match found":
                     self.hide()
-                    sg = StockGraph(ticker, self)
+                    sg = StockGraph(ticker, self, "1y")
                     sg.show()
                 else: 
                     QMessageBox.warning(self, "Input Error", "No matches was found.")
             else:
                 self.hide()
-                sg = StockGraph(ticker, self)
+                sg = StockGraph(ticker, self, "1y")
                 sg.show()
             
             
@@ -91,7 +91,7 @@ class StockApp(QMainWindow):
         sorted_favorites = sorted(favorites, key=lambda x: x[0])
         for row, (ticker, amount) in enumerate(sorted_favorites):
             try:
-                stock_data = self.DB.find_stock(ticker)
+                stock_data = self.find_stock(ticker)
                 long_name = stock_data['long_name']
                 current_price = stock_data['current_price']
                 first_price = stock_data['change']
@@ -181,6 +181,27 @@ class StockApp(QMainWindow):
         self.stock_input.setPlaceholderText("Enter Stock Ticker Symbol")
         self.amount_input.clear()
         self.amount_input.setPlaceholderText("Enter Amount (Number of Shares)")
+    
+    def find_stock(self, stock):
+        try:
+            stock_data = yf.Ticker(stock)
+            info = stock_data.info
+
+            long_name = info.get('longName', stock) 
+            current_price = round(info.get('regularMarketPrice') or info.get('currentPrice') or info.get('previousClose') or 'N/A', 2)
+            change = info.get('regularMarketOpen') or info.get('regularMarketPrice') or info.get('previousClose') or 'N/A'
+            return {
+                'long_name': long_name,
+                'current_price': current_price,
+                'change' : change
+            }
+
+        except Exception as e:
+            print(f"Error fetching data for stock {stock}: {e}")
+            return {
+                'long_name': stock,
+                'current_price': 'N/A'
+            }
 
     def closeEvent(self, event):
         QApplication.quit()  

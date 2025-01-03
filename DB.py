@@ -101,25 +101,6 @@ class DB():
         return favorites
 
 
-    def find_stock(stock):
-        try:
-            stock_data = yf.Ticker(stock)
-            info = stock_data.info
-
-            long_name = info.get('longName', stock) 
-            current_price = round(info.get('regularMarketPrice') or info.get('currentPrice') or info.get('previousClose') or 'N/A', 2)
-            change = info.get('regularMarketOpen') or info.get('regularMarketPrice') or info.get('previousClose') or 'N/A'
-            return {
-                'long_name': long_name,
-                'current_price': current_price,
-                'change' : change
-            }
-
-        except Exception as e:
-            print(f"Error fetching data for stock {stock}: {e}")
-            return {
-                'long_name': stock,
-                'current_price': 'N/A'
-            }
+    
 
 
