@@ -3,7 +3,6 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QTableWidget, QTableWidgetItem, QMessageBox
 )
 from PyQt6.QtGui import QColor
-from PyQt6.QtCore import Qt
 import yfinance as yf
 from DB import DB  
 from StockGraph import StockGraph  
@@ -127,6 +126,10 @@ class StockApp(QMainWindow):
 
         if not self.gcn.ticker_exist(ticker):
             ticker = self.gcn.match(ticker)
+            if ticker == "No match found":
+                QMessageBox.warning(self, "Input Error", "Please enter a stock ticker symbol.")
+                return
+            
         response = QMessageBox.question(self, "Confirm Action", f"Do you want to add {ticker} to favorites?",
                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 
