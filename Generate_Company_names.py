@@ -1,5 +1,5 @@
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
 
 class Generate_Company_names:
     def __init__(self):
@@ -26,19 +26,44 @@ class Generate_Company_names:
 
     def ticker_exist(self, input):
         return input in self.tickers
+    
+    def cosine_similarity_manual(self, vector_a, vector_b):
+        vector_a = vector_a.toarray().flatten()
+        vector_b = vector_b.toarray().flatten()
+
+        dot_product = np.dot(vector_a, vector_b)
+        norm_a = np.linalg.norm(vector_a)
+        norm_b = np.linalg.norm(vector_b)
+        
+        if norm_a == 0 or norm_b == 0:
+            return 0.0 
+        
+        return dot_product / (norm_a * norm_b)
+
+    def compute_cosine_similarities(self, input_vectorized, names_vectorized):
+
+        
+        val = 0
+        index = 0
+        i = 0
+        for name_vector in names_vectorized:
+            similarity = self.cosine_similarity_manual(input_vectorized, name_vector)
+            if similarity > val:
+                val = similarity
+                index = i
+                
+            i += 1
+        
+        return index, val
+
 
     def match(self, input, threshold=0.5):
         input_vectorized = self.vectorizer.transform([input])
         
-        cosine_similarities = cosine_similarity(input_vectorized, self.names_vectorized)
+        index, val = self.compute_cosine_similarities(input_vectorized, self.names_vectorized)
         
-        best_match_index = cosine_similarities.argmax()
-        max_score = cosine_similarities.max()
-
-        best_match_score = cosine_similarities[0, best_match_index]
-        
-        if best_match_score >= threshold:
-            return self.tickers[best_match_index]
+        if val >= threshold:
+            return self.tickers[index]
         else:
             return "No match found"
 

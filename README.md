@@ -13,3 +13,4 @@ Requirements:
         sqlite3 (Standard Library)
         yfinance (Install with: pip install yfinance)
         PyQt6 (Install with: pip install PyQt6)
+        sklearn -- working on removing this

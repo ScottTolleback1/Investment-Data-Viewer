@@ -12,33 +12,27 @@ class StockGraph(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
         self.ticker = ticker.strip().upper()
 
-        # Main layout
         self.central_widget = QWidget()
         self.main_layout = QVBoxLayout(self.central_widget)
 
-        # Label and combo box
         self.label = QLabel(f"Stock: {self.ticker}")
         self.main_layout.addWidget(self.label)
         
         self.button_layout = QHBoxLayout()
         periods = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
-        # Create buttons
         for period in periods:
-            button = QPushButton(period)  # Button text as the period
+            button = QPushButton(period)  
             button.clicked.connect(lambda _, p=period: self.plot_stock_graph(p))
             self.button_layout.addWidget(button)
-                # Add the button layout to the main layout
         self.main_layout.addLayout(self.button_layout)
 
 
-        # Matplotlib figure and canvas
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         self.main_layout.addWidget(self.canvas)
 
         self.setCentralWidget(self.central_widget)
         
-        # Plot the stock graph for the initial period
         self.plot_stock_graph("1y")
 
     def plot_stock_graph(self, period):
@@ -51,26 +45,21 @@ class StockGraph(QMainWindow):
             self.figure.clear()
             ax = self.figure.add_subplot(111)
 
-            # Set background and plot style
-            ax.set_facecolor("black")  # Black background
-            self.figure.patch.set_facecolor("black")  # Background for the figure
+            ax.set_facecolor("black")  
+            self.figure.patch.set_facecolor("black")  
 
             ax.plot(historical_data.index, historical_data['Close'], color="lime", label="Closing Price", linestyle='-', linewidth=2)
 
-            # Set the legend's label color to white
             ax.legend(facecolor='black', edgecolor='white', labelcolor='white')
 
 
-            # Customize titles and labels
             ax.set_title(f"{self.ticker} - Last {period}", color="white")
             ax.set_xlabel("Date", color="white")
             ax.set_ylabel("Price (USD)", color="white")
 
-            # Customize ticks
             ax.tick_params(axis='x', colors="white")
             ax.tick_params(axis='y', colors="white")
             
-            # Add grid
             ax.grid(color="gray", linestyle="--", linewidth=0.5)
 
             self.canvas.draw()
@@ -80,6 +69,5 @@ class StockGraph(QMainWindow):
 
 
     def closeEvent(self, event):
-        # Show the parent window again after closing the StockGraph window
-        self.parent().show()  # parent() returns the main window (StockApp)
-        event.accept()  # Accept the event and close the window
+        self.parent().show() 
+        event.accept()  
